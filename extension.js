@@ -1,26 +1,69 @@
+// extension.js
+import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import St from 'gi://St';
-import PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
-import Main from 'resource:///org/gnome/shell/ui/main.js';
+import GLib from 'gi://GLib';
+import Clutter from 'gi://Clutter';
 
-let clipboardButton;
+export default class ClipboardHistoryExtension extends Extension {
+    constructor(metadata) {
+        super(metadata);
+        this._button = null;
+        this._clipboardHistory = [];
+        this._clipboardLoop = null;
+    }
 
-export function init() {}
+    enable() {
+        this._button = new St.Bin({
+            style_class: 'panel-button',
+            reactive: true,
+            can_focus: true,
+            track_hover: true,
+            child: new St.Label({
+                text: '📋',
+                y_align: Clutter.ActorAlign.CENTER,
+            }),
+        });
 
-export function enable() {
-    clipboardButton = new PanelMenu.Button(0.0, 'Clipboard History');
+        this._button.connect('button-press-event', () => {
+            console.log('📋 Clipboard history:');
+            this._clipboardHistory.forEach((item, index) =>
+                console.log(`${index + 1}: ${item}`)
+            );
+        });
 
-    const icon = new St.Icon({
-        icon_name: 'edit-paste-symbolic',
-        style_class: 'system-status-icon',
-    });
+        Main.panel.addToStatusArea('clipboardhistory', this._button);
 
-    clipboardButton.add_child(icon);
-    Main.panel.addToStatusArea('clipboard-history', clipboardButton);
-}
+        const clipboard = St.Clipboard.get_default();
 
-export function disable() {
-    if (clipboardButton) {
-        clipboardButton.destroy();
-        clipboardButton = null;
+        this._clipboardLoop = GLib.timeout_add_seconds(
+            GLib.PRIORITY_DEFAULT,
+            2,
+            () => {
+                clipboard.get_text(St.ClipboardType.CLIPBOARD, (clip) => {
+                    if (clip && !this._clipboardHistory.includes(clip)) {
+                        this._clipboardHistory.unshift(clip);
+                        if (this._clipboardHistory.length > 10) {
+                            this._clipboardHistory.pop();
+                        }
+                    }
+                });
+                return GLib.SOURCE_CONTINUE;
+            }
+        );
+    }
+
+    disable() {
+        if (this._button) {
+            this._button.destroy();
+            this._button = null;
+        }
+
+        if (this._clipboardLoop) {
+            GLib.source_remove(this._clipboardLoop);
+            this._clipboardLoop = null;
+        }
+
+        this._clipboardHistory = [];
     }
 }
