@@ -4,5 +4,6 @@
   "description": "Keeps a history of copied text items and allows easy reuse.",
   "version": 1,
   "shell-version": ["46"],
-  "url": "https://github.com/shailesh43/clipboard-history"
+  "url": "https://github.com/shailesh43/clipboard-history",
+  "type": "module"
 }
