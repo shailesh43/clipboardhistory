@@ -2,8 +2,10 @@
   "uuid": "clipboardhistory@shailesh43.github.io",
   "name": "Clipboard History",
   "description": "Keeps a history of copied text items and allows easy reuse.",
-  "version": 1,
+  "version": 2,
   "shell-version": ["46"],
   "url": "https://github.com/shailesh43/clipboard-history",
+  "settings-schema": "org.gnome.shell.extensions.clipboard-history",
+  "gettext-domain": "clipboard-history",
   "type": "module"
 }
