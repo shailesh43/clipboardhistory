@@ -1,0 +1,8 @@
+{
+  "uuid": "clipboardhistory@shailesh43.github.io",
+  "name": "Clipboard History",
+  "description": "Keeps a history of copied text items and allows easy reuse.",
+  "version": 1,
+  "shell-version": ["45", "44"],
+  "url": "https://github.com/shailesh43/clipboard-history"
+}
